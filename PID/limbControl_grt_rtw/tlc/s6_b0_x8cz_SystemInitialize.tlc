@@ -1,0 +1,50 @@
+%implements s6_b0_x8cz_SystemInitialize "C"
+
+%function SystemInitialize(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%<SLibInsertAsyncTaskInitializeCode(system)>
+%<SLibWriteMachineInitialize()>
+/* InitializeConditions for Integrator: '<S6>/Integrator' */
+limbControl_X.Integrator_CSTATE = limbControl_P.Integrator_IC;
+/* InitializeConditions for RateTransition: '<Root>/Rate Transition2' */
+limbControl_DW.RateTransition2_Buffer0 = limbControl_P.RateTransition2_InitialConditio;
+/* InitializeConditions for Integrator: '<S63>/Integrator' */
+limbControl_X.Integrator_CSTATE_p = limbControl_P.PIDController_InitialConditio_p;
+/* InitializeConditions for Integrator: '<S43>/Filter' */
+limbControl_X.Filter_CSTATE = limbControl_P.PIDController_InitialConditionF;
+/* InitializeConditions for UnitDelay: '<S107>/Output' */
+limbControl_DW.Output_DSTATE = limbControl_P.Output_InitialCondition;
+/* InitializeConditions for Integrator: '<S6>/Integrator1' */
+limbControl_X.Integrator1_CSTATE = limbControl_P.Integrator1_IC;
+/* InitializeConditions for Integrator: '<S10>/Integrator' */
+limbControl_X.Integrator_CSTATE_j = limbControl_P.Integrator_IC_b;
+/* InitializeConditions for RateTransition: '<Root>/Rate Transition4' */
+limbControl_DW.RateTransition4_Buffer0 = limbControl_P.RateTransition4_InitialConditio;
+/* InitializeConditions for Integrator: '<S2>/Integrator' */
+limbControl_X.Integrator_CSTATE_m = limbControl_P.Integrator_IC_d;
+/* InitializeConditions for Derivative: '<S2>/Derivative' */
+limbControl_DW.TimeStampA = %<LibGetMathConstant(LibRealNonFinite("inf"), FcnGetDataTypeIdFromName("double"))>;
+limbControl_DW.TimeStampB = %<LibGetMathConstant(LibRealNonFinite("inf"), FcnGetDataTypeIdFromName("double"))>;
+/* InitializeConditions for UnitDelay: '<S110>/Output' */
+limbControl_DW.Output_DSTATE_p = limbControl_P.Output_InitialCondition_b;
+/* InitializeConditions for Integrator: '<S10>/Integrator1' */
+limbControl_X.Integrator1_CSTATE_l = limbControl_P.Integrator1_IC_n;
+/* InitializeConditions for Integrator: '<S1>/Integrator' */
+limbControl_X.Integrator_CSTATE_f = limbControl_P.Integrator_IC_l;
+/* InitializeConditions for Integrator: '<S1>/Integrator1' */
+limbControl_X.Integrator1_CSTATE_c = limbControl_P.Integrator1_IC_j;
+%<SLibInsertInitPeriodicCStatesFcn(system)>
+%closefile cfgTxt
+%<cfgTxt>
+%<LibSetSystemField(system, "CachedSystemInitializeLocalVars", localVarDecl)>
+%endfunction
+%function SystemInitializeFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void SystemInitialize(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 1, fcnProtoType)>
+%endfunction

@@ -1,0 +1,41 @@
+%implements s6_b0_x8cz_ForcingFunction "C"
+
+%function ForcingFunction(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%openfile localVarDecl
+
+XDot_limbControl_T *_rtXdot;
+%closefile localVarDecl
+_rtXdot = %<(SLibCG_SE(SLibGetContStatesDerivativeStructPtr()))>;
+/* ForcingFunction for Integrator: '<S6>/Integrator' */
+_rtXdot->Integrator_CSTATE = limbControl_B.Integrator1;
+/* ForcingFunction for Integrator: '<S63>/Integrator' */
+_rtXdot->Integrator_CSTATE_p = limbControl_B.IntegralGain;
+/* ForcingFunction for Integrator: '<S43>/Filter' */
+_rtXdot->Filter_CSTATE = limbControl_B.FilterCoefficient;
+/* ForcingFunction for Integrator: '<S6>/Integrator1' */
+_rtXdot->Integrator1_CSTATE = limbControl_B.Gain;
+/* ForcingFunction for Integrator: '<S10>/Integrator' */
+_rtXdot->Integrator_CSTATE_j = limbControl_B.Integrator1_o;
+/* ForcingFunction for Integrator: '<S2>/Integrator' */
+_rtXdot->Integrator_CSTATE_m = limbControl_B.Add1;
+/* ForcingFunction for Integrator: '<S10>/Integrator1' */
+_rtXdot->Integrator1_CSTATE_l = limbControl_B.Gain_n;
+/* ForcingFunction for Integrator: '<S1>/Integrator' */
+_rtXdot->Integrator_CSTATE_f = limbControl_B.Integrator1_a;
+/* ForcingFunction for Integrator: '<S1>/Integrator1' */
+_rtXdot->Integrator1_CSTATE_c = limbControl_B.Gain_g;
+%closefile cfgTxt
+%<cfgTxt>
+%<LibSetSystemField(system, "CachedForcingFunctionLocalVars", localVarDecl)>
+%endfunction
+%function ForcingFunctionFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void ForcingFunction(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 5, fcnProtoType)>
+%endfunction

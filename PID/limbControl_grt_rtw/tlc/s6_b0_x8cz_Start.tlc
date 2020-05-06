@@ -1,0 +1,51 @@
+%implements s6_b0_x8cz_Start "C"
+
+%function Start(block, system) Output
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%assign tlcStartFcnOfS6B0 = OpaqueTLCBlockFcn("Start", 6, 0, 0, 0)
+%assign tlcStartFcnOfS6B4 = OpaqueTLCBlockFcn("Start", 6, 4, 0, 0)
+%assign tlcStartFcnOfS6B5 = OpaqueTLCBlockFcn("Start", 6, 5, 0, 0)
+%assign tlcStartFcnOfS6B11 = OpaqueTLCBlockFcn("Start", 6, 11, 0, 0)
+%assign tlcStartFcnOfS6B16 = OpaqueTLCBlockFcn("Start", 6, 16, 0, 0)
+%assign tlcStartFcnOfS6B17 = OpaqueTLCBlockFcn("Start", 6, 17, 0, 0)
+/* Start for RateTransition: '<Root>/Rate Transition2' */
+limbControl_B.RateTransition2 = limbControl_P.RateTransition2_InitialConditio;
+%if !WHITE_SPACE(tlcStartFcnOfS6B0)
+/* Start for Scope: '<Root>/Scope' */
+%<tlcStartFcnOfS6B0>\
+%endif
+%if !WHITE_SPACE(tlcStartFcnOfS6B4)
+/* Start for Scope: '<Root>/Scope1' */
+%<tlcStartFcnOfS6B4>\
+%endif
+%if !WHITE_SPACE(tlcStartFcnOfS6B5)
+/* Start for Scope: '<Root>/Scope2' */
+%<tlcStartFcnOfS6B5>\
+%endif
+/* Start for RateTransition: '<Root>/Rate Transition4' */
+limbControl_B.RateTransition4 = limbControl_P.RateTransition4_InitialConditio;
+%if !WHITE_SPACE(tlcStartFcnOfS6B11)
+/* Start for Scope: '<Root>/Scope5' */
+%<tlcStartFcnOfS6B11>\
+%endif
+%if !WHITE_SPACE(tlcStartFcnOfS6B16)
+/* Start for Scope: '<Root>/Scope6' */
+%<tlcStartFcnOfS6B16>\
+%endif
+%if !WHITE_SPACE(tlcStartFcnOfS6B17)
+/* Start for Scope: '<Root>/Scope7' */
+%<tlcStartFcnOfS6B17>\
+%endif
+%closefile cfgTxt
+%<cfgTxt>
+%endfunction
+%function StartFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void Start(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 0, fcnProtoType)>
+%endfunction

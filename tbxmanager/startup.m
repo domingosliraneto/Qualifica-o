@@ -1,0 +1,3 @@
+tbxmanager restorepath
+tbxmanager restorepath
+tbxmanager restorepath

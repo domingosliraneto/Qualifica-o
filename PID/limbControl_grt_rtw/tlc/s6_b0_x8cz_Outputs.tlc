@@ -1,0 +1,315 @@
+%implements s6_b0_x8cz_Outputs "C"
+
+%function Outputs(block, system) Output
+%<SLibCGIRAccessLocalVar(46, 0, "")> %% rtb_Integrator
+%<SLibCGIRAccessLocalVar(4, 0, "")> %% rtb_Output
+%<SLibCGIRAccessLocalVar(17, 0, "")> %% rtb_Output_n
+%<SLibCGIRAccessLocalVar(45, 0, "")> %% rtb_Multiply1_k
+%<SLibCGIRAccessLocalVar(48, 0, "")> %% rtb_FixPtSwitch
+%<SLibCGIRAccessLocalVar(50, 0, "")> %% rtb_FixPtSwitch_o
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%openfile localVarDecl
+
+real_T *lastU;
+int_T idx;
+real_T rtb_Polynomial1;
+uint8_T rtb_FixPtSum1;
+real_T tmp;
+real_T Gain_tmp;
+%closefile localVarDecl
+%assign tlcOutputsFcnOfS6B0 = OpaqueTLCBlockFcn("Outputs", 6, 0, 0, 2)
+%assign tlcOutputsFcnOfS6B4 = OpaqueTLCBlockFcn("Outputs", 6, 4, 0, 2)
+%assign tlcOutputsFcnOfS6B5 = OpaqueTLCBlockFcn("Outputs", 6, 5, 0, 2)
+%assign tlcOutputsFcnOfS6B11 = OpaqueTLCBlockFcn("Outputs", 6, 11, 0, 2)
+%assign tlcOutputsFcnOfS6B12 = OpaqueTLCBlockFcn("Outputs", 6, 12, 0, 2)
+%assign tlcOutputsFcnOfS6B16 = OpaqueTLCBlockFcn("Outputs", 6, 16, 0, 2)
+%assign tlcOutputsFcnOfS6B17 = OpaqueTLCBlockFcn("Outputs", 6, 17, 0, 2)
+/* {S!d46}Integrator: '<S6>/Integrator' */
+limbControl_B.Integrator = limbControl_X.Integrator_CSTATE;
+/* {S!d50}RateTransition: '<Root>/Rate Transition2' */
+if (%<(SLibCGIRIsSampleHit(1, 6))>) {
+    if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+        limbControl_B.RateTransition2 = limbControl_DW.RateTransition2_Buffer0;
+    }
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B0)
+    /* {S!d48}Scope: '<Root>/Scope' */
+%<tlcOutputsFcnOfS6B0>\
+%endif
+}
+/* {E!d50}End of RateTransition: '<Root>/Rate Transition2' */
+
+/* {S!d52}Sum: '<Root>/Add' */
+limbControl_B.Add = limbControl_B.RateTransition2 - limbControl_B.Integrator;
+/* {S!d54}Integrator: '<S63>/Integrator' */
+rtb_Multiply1_k = limbControl_X.Integrator_CSTATE_p;
+/* {S!d56}Integrator: '<S43>/Filter' */
+rtb_Integrator = limbControl_X.Filter_CSTATE;
+/* {S!d58}Gain: '<S75>/Filter Coefficient' incorporates:
+ *  Gain: '<S42>/Derivative Gain'
+ *  Sum: '<S43>/SumD'
+ */
+limbControl_B.FilterCoefficient = (limbControl_P.PIDController_D * limbControl_B.Add - rtb_Integrator) * limbControl_P.PIDController_N;
+/* {S!d60}Gain: '<S57>/Proportional Gain' incorporates:
+ *  Sum: '<S95>/Sum'
+ */
+rtb_Integrator = ((limbControl_B.Add + rtb_Multiply1_k) + limbControl_B.FilterCoefficient) * limbControl_P.PIDController_P;
+/* {S!d62}Saturate: '<S86>/Saturation' */
+if (rtb_Integrator > limbControl_P.PIDController_UpperSaturationLi) {
+    limbControl_B.Saturation = limbControl_P.PIDController_UpperSaturationLi;
+} else if (rtb_Integrator < limbControl_P.PIDController_LowerSaturationLi) {
+    limbControl_B.Saturation = limbControl_P.PIDController_LowerSaturationLi;
+} else {
+    limbControl_B.Saturation = rtb_Integrator;
+}
+/* {E!d62}End of Saturate: '<S86>/Saturation' */
+
+/* {S!d68}Switch: '<S8>/Switch' incorporates:
+ *  Constant: '<S8>/Constant'
+ *  Sum: '<S8>/Add'
+ */
+if (limbControl_B.Saturation - limbControl_P.Constant_Value >= limbControl_P.Switch_Threshold) {
+    /* {S!d64}Polyval: '<S8>/Polynomial3' */
+    rtb_Polynomial1 = limbControl_P.Polynomial3_Coefs_g[0];
+    for (idx = 0; idx < 7; idx++) {
+        rtb_Polynomial1 = rtb_Polynomial1 * limbControl_B.Saturation + limbControl_P.Polynomial3_Coefs_g[idx + 1];
+    }
+    /* {E!d64}End of Polyval: '<S8>/Polynomial3' */
+    limbControl_B.Switch = rtb_Polynomial1;
+} else {
+    /* {S!d66}Polyval: '<S8>/Polynomial1' */
+    rtb_Polynomial1 = limbControl_P.Polynomial1_Coefs_m[0];
+    for (idx = 0; idx < 7; idx++) {
+        rtb_Polynomial1 = rtb_Polynomial1 * limbControl_B.Saturation + limbControl_P.Polynomial1_Coefs_m[idx + 1];
+    }
+    /* {E!d66}End of Polyval: '<S8>/Polynomial1' */
+    limbControl_B.Switch = rtb_Polynomial1;
+}
+/* {E!d68}End of Switch: '<S8>/Switch' */
+if (%<(SLibCGIRIsSampleHit(1, 6))>) {
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B4)
+    /* {S!d70}Scope: '<Root>/Scope1' */
+%<tlcOutputsFcnOfS6B4>\
+%endif
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B5)
+    /* {S!d72}Scope: '<Root>/Scope2' */
+%<tlcOutputsFcnOfS6B5>\
+%endif
+}
+/* {S!d74}Gain: '<S55>/Integral Gain' */
+limbControl_B.IntegralGain = limbControl_P.PIDController_I * limbControl_B.Add;
+if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+    /* {S!d76}Sum: '<S108>/FixPt Sum1' incorporates:
+ *  Constant: '<S108>/FixPt Constant'
+ *  UnitDelay: '<S107>/Output'
+ */
+    rtb_FixPtSum1 = (uint8_T)((uint32_T)limbControl_DW.Output_DSTATE + limbControl_P.FixPtConstant_Value);
+    /* {S!d78}Switch: '<S109>/FixPt Switch' incorporates:
+ *  Constant: '<S109>/Constant'
+ */
+    if (rtb_FixPtSum1 > limbControl_P.LimitedCounter_uplimit) {
+        rtb_FixPtSwitch = limbControl_P.Constant_Value_l;
+    } else {
+        rtb_FixPtSwitch = rtb_FixPtSum1;
+    }
+    /* {E!d78}End of Switch: '<S109>/FixPt Switch' */
+
+    /* {S!d80}MultiPortSwitch: '<S4>/Output' incorporates:
+ *  Constant: '<S4>/Vector'
+ *  UnitDelay: '<S107>/Output'
+ */
+    rtb_Output = limbControl_P.RepeatingSequenceStair2_OutValu[limbControl_DW.Output_DSTATE];
+}
+if (%<(SLibCGIRIsSampleHit(1, 6))>) {
+    /* {S!d82}Gain: '<S6>/Gain1' */
+    limbControl_B.Gain1 = -limbControl_P.B1 * 0.0;
+}
+/* {S!d84}Integrator: '<S6>/Integrator1' */
+limbControl_B.Integrator1 = limbControl_X.Integrator1_CSTATE;
+/* {S!d86}Gain: '<S6>/Gain7' incorporates:
+ *  Gain: '<S10>/Gain7'
+ *  Gain: '<S1>/Gain7'
+ */
+Gain_tmp = limbControl_P.m * limbControl_P.g * limbControl_P.l;
+/* {S!d88}Gain: '<S6>/Gain' incorporates:
+ *  Constant: '<S6>/Constant'
+ *  Constant: '<S6>/Constant1'
+ *  Gain: '<S6>/Gain3'
+ *  Gain: '<S6>/Gain4'
+ *  Gain: '<S6>/Gain5'
+ *  Gain: '<S6>/Gain7'
+ *  Math: '<S6>/Exp'
+ *  Product: '<S6>/Multiply'
+ *  Product: '<S6>/Multiply1'
+ *  Sum: '<S6>/Add'
+ *  Sum: '<S6>/Add2'
+ *  Trigonometry: '<S6>/Cos'
+ *  Trigonometry: '<S6>/Sin'
+ *
+ * About '<S6>/Exp':
+ *  Operator: exp
+ */
+limbControl_B.Gain = (((((limbControl_B.Switch * cos(limbControl_B.Integrator) - exp(-limbControl_P.K2 * limbControl_B.Integrator) * limbControl_P.K1 * (limbControl_B.Integrator - limbControl_P.K3)) - Gain_tmp * sin(limbControl_B.Integrator)) - limbControl_B.Gain1) - limbControl_P.B3 * limbControl_B.Integrator1) + -limbControl_P.Td) * (1.0 / limbControl_P.J);
+/* {S!d90}Integrator: '<S10>/Integrator' */
+limbControl_B.Integrator_c = limbControl_X.Integrator_CSTATE_j;
+/* {S!d94}RateTransition: '<Root>/Rate Transition4' */
+if (%<(SLibCGIRIsSampleHit(1, 6))>) {
+    if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+        limbControl_B.RateTransition4 = limbControl_DW.RateTransition4_Buffer0;
+    }
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B11)
+    /* {S!d92}Scope: '<Root>/Scope5' */
+%<tlcOutputsFcnOfS6B11>\
+%endif
+}
+/* {E!d94}End of RateTransition: '<Root>/Rate Transition4' */
+
+/* {S!d96}Integrator: '<S2>/Integrator' */
+rtb_Integrator = limbControl_X.Integrator_CSTATE_m;
+/* {S!d98}Sum: '<Root>/Add1' */
+limbControl_B.Add1 = limbControl_B.RateTransition4 - limbControl_B.Integrator_c;
+/* {S!d100}Derivative: '<S2>/Derivative' */
+tmp = %<(SLibCG_SE(LibGetT()))>;
+if ((limbControl_DW.TimeStampA >= tmp) && (limbControl_DW.TimeStampB >= tmp)) {
+    rtb_Multiply1_k = 0.0;
+} else {
+    rtb_Polynomial1 = limbControl_DW.TimeStampA;
+    lastU = &limbControl_DW.LastUAtTimeA;
+    if (limbControl_DW.TimeStampA < limbControl_DW.TimeStampB) {
+        if (limbControl_DW.TimeStampB < tmp) {
+            rtb_Polynomial1 = limbControl_DW.TimeStampB;
+            lastU = &limbControl_DW.LastUAtTimeB;
+        }
+    } else {
+        if (limbControl_DW.TimeStampA >= tmp) {
+            rtb_Polynomial1 = limbControl_DW.TimeStampB;
+            lastU = &limbControl_DW.LastUAtTimeB;
+        }
+    }
+    rtb_Multiply1_k = (limbControl_B.Add1 - *lastU) / (tmp - rtb_Polynomial1);
+}
+/* {E!d100}End of Derivative: '<S2>/Derivative' */
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B12)
+
+/* {S!d102}MATLABFcn: '<S2>/Interpreted MATLAB Function' */
+%<tlcOutputsFcnOfS6B12>\
+%endif
+/* {S!d108}Switch: '<S7>/Switch' incorporates:
+ *  Constant: '<S7>/Constant'
+ *  Sum: '<S7>/Add'
+ */
+if (limbControl_B.InterpretedMATLABFunction - limbControl_P.Constant_Value_g >= limbControl_P.Switch_Threshold_l) {
+    /* {S!d104}Polyval: '<S7>/Polynomial3' */
+    rtb_Polynomial1 = limbControl_P.Polynomial3_Coefs[0];
+    for (idx = 0; idx < 7; idx++) {
+        rtb_Polynomial1 = rtb_Polynomial1 * limbControl_B.InterpretedMATLABFunction + limbControl_P.Polynomial3_Coefs[idx + 1];
+    }
+    /* {E!d104}End of Polyval: '<S7>/Polynomial3' */
+    limbControl_B.Switch_m = rtb_Polynomial1;
+} else {
+    /* {S!d106}Polyval: '<S7>/Polynomial1' */
+    rtb_Polynomial1 = limbControl_P.Polynomial1_Coefs[0];
+    for (idx = 0; idx < 7; idx++) {
+        rtb_Polynomial1 = rtb_Polynomial1 * limbControl_B.InterpretedMATLABFunction + limbControl_P.Polynomial1_Coefs[idx + 1];
+    }
+    /* {E!d106}End of Polyval: '<S7>/Polynomial1' */
+    limbControl_B.Switch_m = rtb_Polynomial1;
+}
+/* {E!d108}End of Switch: '<S7>/Switch' */
+if (%<(SLibCGIRIsSampleHit(1, 6))>) {
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B16)
+    /* {S!d110}Scope: '<Root>/Scope6' */
+%<tlcOutputsFcnOfS6B16>\
+%endif
+%if !WHITE_SPACE(tlcOutputsFcnOfS6B17)
+    /* {S!d112}Scope: '<Root>/Scope7' */
+%<tlcOutputsFcnOfS6B17>\
+%endif
+    /* {S!d114}Gain: '<S10>/Gain1' */
+    limbControl_B.Gain1_n = -limbControl_P.B1 * 0.0;
+}
+if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+    /* {S!d116}Sum: '<S111>/FixPt Sum1' incorporates:
+ *  Constant: '<S111>/FixPt Constant'
+ *  UnitDelay: '<S110>/Output'
+ */
+    rtb_FixPtSum1 = (uint8_T)((uint32_T)limbControl_DW.Output_DSTATE_p + limbControl_P.FixPtConstant_Value_g);
+    /* {S!d118}Switch: '<S112>/FixPt Switch' incorporates:
+ *  Constant: '<S112>/Constant'
+ */
+    if (rtb_FixPtSum1 > limbControl_P.LimitedCounter_uplimit_p) {
+        rtb_FixPtSwitch_o = limbControl_P.Constant_Value_l0;
+    } else {
+        rtb_FixPtSwitch_o = rtb_FixPtSum1;
+    }
+    /* {E!d118}End of Switch: '<S112>/FixPt Switch' */
+
+    /* {S!d120}MultiPortSwitch: '<S5>/Output' incorporates:
+ *  Constant: '<S5>/Vector'
+ *  UnitDelay: '<S110>/Output'
+ */
+    rtb_Output_n = limbControl_P.RepeatingSequenceStair4_OutValu[limbControl_DW.Output_DSTATE_p];
+}
+/* {S!d122}Integrator: '<S10>/Integrator1' */
+limbControl_B.Integrator1_o = limbControl_X.Integrator1_CSTATE_l;
+/* {S!d124}Gain: '<S10>/Gain' incorporates:
+ *  Constant: '<S10>/Constant'
+ *  Constant: '<S10>/Constant1'
+ *  Gain: '<S10>/Gain3'
+ *  Gain: '<S10>/Gain4'
+ *  Gain: '<S10>/Gain5'
+ *  Gain: '<S10>/Gain7'
+ *  Math: '<S10>/Exp'
+ *  Product: '<S10>/Multiply'
+ *  Product: '<S10>/Multiply1'
+ *  Sum: '<S10>/Add'
+ *  Sum: '<S10>/Add2'
+ *  Trigonometry: '<S10>/Cos'
+ *  Trigonometry: '<S10>/Sin'
+ *
+ * About '<S10>/Exp':
+ *  Operator: exp
+ */
+limbControl_B.Gain_n = (((((limbControl_B.Switch_m * cos(limbControl_B.Integrator_c) - exp(-limbControl_P.K2 * limbControl_B.Integrator_c) * limbControl_P.K1 * (limbControl_B.Integrator_c - limbControl_P.K3)) - Gain_tmp * sin(limbControl_B.Integrator_c)) - limbControl_B.Gain1_n) - limbControl_P.B3 * limbControl_B.Integrator1_o) + -limbControl_P.Td) * (1.0 / limbControl_P.J);
+/* {S!d126}Integrator: '<S1>/Integrator' */
+rtb_Integrator = limbControl_X.Integrator_CSTATE_f;
+/* {S!d128}Trigonometry: '<S1>/Cos' */
+rtb_Multiply1_k = cos(rtb_Integrator);
+/* {S!d130}Product: '<S1>/Multiply1' */
+rtb_Multiply1_k *= 0.0;
+/* {S!d132}Integrator: '<S1>/Integrator1' */
+limbControl_B.Integrator1_a = limbControl_X.Integrator1_CSTATE_c;
+/* {S!d134}Gain: '<S1>/Gain' incorporates:
+ *  Constant: '<S1>/Constant'
+ *  Constant: '<S1>/Constant1'
+ *  Gain: '<S1>/Gain1'
+ *  Gain: '<S1>/Gain2'
+ *  Gain: '<S1>/Gain3'
+ *  Gain: '<S1>/Gain4'
+ *  Gain: '<S1>/Gain5'
+ *  Gain: '<S1>/Gain7'
+ *  Math: '<S1>/Exp'
+ *  Product: '<S1>/Multiply'
+ *  Sum: '<S1>/Add'
+ *  Sum: '<S1>/Add2'
+ *  Trigonometry: '<S1>/Sin'
+ *  Trigonometry: '<S1>/Tanh'
+ *
+ * About '<S1>/Exp':
+ *  Operator: exp
+ */
+limbControl_B.Gain_g = (((((exp(-limbControl_P.K2 * rtb_Integrator) * limbControl_P.K1 * (rtb_Integrator - limbControl_P.K3) + rtb_Multiply1_k) + Gain_tmp * sin(rtb_Integrator)) + tanh(-limbControl_P.B2 * limbControl_B.Integrator1_a) * -limbControl_P.B1) + limbControl_P.B3 * limbControl_B.Integrator1_a) + -limbControl_P.Td) * (1.0 / limbControl_P.J);
+%<SLibInsertSolverResetCode()>\
+%closefile cfgTxt
+%<cfgTxt>
+%<LibSetSystemField(system, "CachedOutputLocalVars", localVarDecl)>
+%endfunction
+%function OutputsFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void Outputs(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 2, fcnProtoType)>
+%endfunction

@@ -1,0 +1,56 @@
+%implements s6_b0_x8cz_Update "C"
+
+%function Update(block, system) Output
+%<SLibCGIRAccessLocalVar(4, 0, "")> %% rtb_Output
+%<SLibCGIRAccessLocalVar(17, 0, "")> %% rtb_Output_n
+%<SLibCGIRAccessLocalVar(48, 0, "")> %% rtb_FixPtSwitch
+%<SLibCGIRAccessLocalVar(50, 0, "")> %% rtb_FixPtSwitch_o
+%assign cfgTxt = ""
+%openfile cfgTxt
+%assign localVarDecl = ""
+%openfile localVarDecl
+
+real_T *lastU;
+%closefile localVarDecl
+/* {S!d140}Update for RateTransition: '<Root>/Rate Transition2' */
+if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+    limbControl_DW.RateTransition2_Buffer0 = rtb_Output;
+    /* {S!d136}Update for UnitDelay: '<S107>/Output' */
+    limbControl_DW.Output_DSTATE = rtb_FixPtSwitch;
+    /* {S!d138}Update for RateTransition: '<Root>/Rate Transition4' */
+    limbControl_DW.RateTransition4_Buffer0 = rtb_Output_n;
+}
+/* {E!d140}End of Update for RateTransition: '<Root>/Rate Transition2' */
+
+/* {S!d142}Update for Derivative: '<S2>/Derivative' */
+if (limbControl_DW.TimeStampA == %<LibGetMathConstant(LibRealNonFinite("inf"), FcnGetDataTypeIdFromName("double"))>) {
+    limbControl_DW.TimeStampA = %<(SLibCG_SE(LibGetT()))>;
+    lastU = &limbControl_DW.LastUAtTimeA;
+} else if (limbControl_DW.TimeStampB == %<LibGetMathConstant(LibRealNonFinite("inf"), FcnGetDataTypeIdFromName("double"))>) {
+    limbControl_DW.TimeStampB = %<(SLibCG_SE(LibGetT()))>;
+    lastU = &limbControl_DW.LastUAtTimeB;
+} else if (limbControl_DW.TimeStampA < limbControl_DW.TimeStampB) {
+    limbControl_DW.TimeStampA = %<(SLibCG_SE(LibGetT()))>;
+    lastU = &limbControl_DW.LastUAtTimeA;
+} else {
+    limbControl_DW.TimeStampB = %<(SLibCG_SE(LibGetT()))>;
+    lastU = &limbControl_DW.LastUAtTimeB;
+}
+*lastU = limbControl_B.Add1;
+/* {E!d142}End of Update for Derivative: '<S2>/Derivative' */
+if (%<(SLibCGIRIsSampleHit(2, 6))>) {
+    /* {S!d144}Update for UnitDelay: '<S110>/Output' */
+    limbControl_DW.Output_DSTATE_p = rtb_FixPtSwitch_o;
+}
+%closefile cfgTxt
+%<cfgTxt>
+%<LibSetSystemField(system, "CachedUpdateLocalVars", localVarDecl)>
+%endfunction
+%function UpdateFcnProtoType(block, system) Output
+%assign fcnProtoType = ""
+%openfile fcnProtoType
+static void Update(\
+%assign comma = ""
+%closefile fcnProtoType
+%<SLibCG_SetFcnProtoType(0, 3, fcnProtoType)>
+%endfunction
